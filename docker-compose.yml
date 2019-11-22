@@ -1,0 +1,38 @@
+version: "3"
+services:
+  mysql:
+    image: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - LANG=en_US.UTF-8
+      - MYSQL_DATABASE=eureka
+    command:
+      - mysqld
+      - --character-set-server=utf8
+      - --default-storage-engine=InnoDB
+      - --lower-case-table-names=1
+    volumes:
+      - ../mysql/data:/var/lib/mysql
+    restart: always
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    restart: always
+  eureka:
+    image: eureka:0.0.1-SNAPSHOT
+    build:
+      context: .
+    depends_on:
+      - mysql
+      - redis
+    links:
+      - mysql
+      - redis
+    ports:
+      - "9000:9000"
+    volumes:
+      - .:/eureka
+    restart: always
